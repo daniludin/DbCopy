@@ -63,11 +63,16 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 		return result.toString();
 	}
 
-	public String listAttributesSorted(DatabaseMetaData meta, String catalog, String schemaPattern, String tableName)
+	public String listAttributesSorted(DatabaseMetaData meta, String catalog, String schemaPattern,  String tableSchema, String tableName)
 			throws SQLException {
 		Map<String, String> sortedAttrs = new HashMap<String, String>();
 		ResultSet rsColumns = meta.getColumns(catalog, schemaPattern, tableName, null);
-
+		StringBuffer result = new StringBuffer();
+		result.append("CREATE TABLE " + tableSchema + "." + tableName).append(" (").append(NL);
+		
+		StringBuffer temp = new StringBuffer();
+		temp.append(listPrimaryKeys(meta, catalog, schemaPattern, tableName));
+		
 		while (rsColumns.next()) {
 			StringBuffer sbAttr = new StringBuffer();
 			String columnName = rsColumns.getString("COLUMN_NAME");
@@ -77,17 +82,29 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 			if (rsColumns.getInt("NULLABLE") == 0) {
 				sbAttr.append(" NOT NULL");
 			}
-			sortedAttrs.put(columnName, sbAttr.toString());
+			if (!rsColumns.isLast()) {
+				sbAttr.append(", ");
+
+			}
+			//sbAttr.append(listPrimaryKeys(meta, catalog, schemaPattern, tableName));
+			sbAttr.append(NL);
+			//sortedAttrs.put(columnName, sbAttr.toString());
+			result.append(sbAttr);
 		}
 		rsColumns.close();
 
-		List<String> sortedKeys = new ArrayList<String>(sortedAttrs.keySet());
-		Collections.sort(sortedKeys);
-		StringBuffer result = new StringBuffer();
-		for (String key : sortedKeys) {
-			result.append(sortedAttrs.get(key));
-			result.append(NL);
+		
+		if (temp.length() > 0) {
+			result.append(", ");				
+			result.append(temp);
 		}
+
+//		List<String> sortedKeys = new ArrayList<String>(sortedAttrs.keySet());
+//		Collections.sort(sortedKeys);
+//		for (String key : sortedKeys) {
+//			result.append(sortedAttrs.get(key));
+//			result.append(NL);
+//		}
 
 		return result.toString();
 

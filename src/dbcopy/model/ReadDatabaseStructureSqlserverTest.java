@@ -85,10 +85,11 @@ public class ReadDatabaseStructureSqlserverTest extends ReadDatabaseStructure {
 				if (tableSchema.contains("sys") || tableSchema.contains("INFORMATION_SCHEMA")) {
 					continue;
 				}
-				System.out.println("============ " + tableName +" ===============");
+				result.append(NL);
+				result.append("============ " + tableName +" ===============");
 				result.append(NL);
 				result.append(tableSchema + "." + tableName).append(NL);
-				result.append(listAttributesSorted(meta, catalog, schemaPattern, tableName));
+				result.append(listAttributesSorted(meta, catalog, schemaPattern, tableSchema, tableName));
 				if (tableType.equals("TABLE")) {
 					result.append(listAll(meta, catalog, schemaPattern, tableName));
 				}
@@ -115,21 +116,21 @@ public class ReadDatabaseStructureSqlserverTest extends ReadDatabaseStructure {
 		
 		ResultSet rs = meta.getExportedKeys(catalog, tableSchema, tableName);
 		result.append(listAllColumns(rs));
-		System.out.println();
-		System.out.println("---getExportedKeys----------");
-		System.out.println(listAllColumns(meta.getExportedKeys(catalog, tableSchema, tableName)).toString());
+		result.append("");
+		result.append("---getExportedKeys----------");
+		result.append(listAllColumns(meta.getExportedKeys(catalog, tableSchema, tableName)).toString());
 
 		rs = meta.getImportedKeys(catalog, tableSchema, tableName);
 		result.append(listAllColumns(rs));
-		System.out.println();
-		System.out.println("---getImportedKeys----------");
-		System.out.println(listAllColumns(meta.getImportedKeys(catalog, tableSchema, tableName)).toString());
+		result.append("");
+		result.append("---getImportedKeys----------");
+		result.append(listAllColumns(meta.getImportedKeys(catalog, tableSchema, tableName)).toString());
 
 		rs = meta.getIndexInfo(null, tableSchema, tableName, true, true);
 		result.append(listAllColumns(rs));
-		System.out.println();
-		System.out.println("---getIndexInfo----------");
-		System.out.println(listAllColumns(meta.getIndexInfo(null, tableSchema, tableName, true, true)).toString());
+		result.append("");
+		result.append("---getIndexInfo----------");
+		result.append(listAllColumns(meta.getIndexInfo(null, tableSchema, tableName, true, true)).toString());
 
 		return result.toString();
 	}
