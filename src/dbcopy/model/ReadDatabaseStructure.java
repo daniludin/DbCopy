@@ -68,7 +68,7 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 		Map<String, String> sortedAttrs = new HashMap<String, String>();
 		ResultSet rsColumns = meta.getColumns(catalog, schemaPattern, tableName, null);
 		StringBuffer result = new StringBuffer();
-		result.append("CREATE TABLE " + tableSchema + "." + tableName).append(" (").append(NL);
+		result.append("CREATE TABLE " + tableSchema + ".\"" + tableName).append("\" (").append(NL);
 		
 		StringBuffer temp = new StringBuffer();
 		temp.append(listPrimaryKeys(meta, catalog, schemaPattern, tableName));
@@ -78,7 +78,7 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 			String columnName = rsColumns.getString("COLUMN_NAME");
 			String columnType = rsColumns.getString("TYPE_NAME").toUpperCase();
 			int columnSize = rsColumns.getInt("COLUMN_SIZE");
-			if (columnType.equals("IMAGE") || columnType.equals("NTEXT") || columnType.contains("INT IDENTITY") ) {
+			if (columnType.equals("IMAGE") || columnType.equals("NTEXT") || columnType.equals("INT IDENTITY") || columnType.equals("INT") || columnType.equals("DATETIME") || columnType.equals("MONEY") || columnType.equals("SMALLINT")  || columnType.equals("REAL")  || columnType.equals("BIT") ) {
 				sbAttr.append("\t" + columnName + "\t" + columnType);
 			} else {
 				sbAttr.append("\t" + columnName + "\t" + columnType + "(" + columnSize + ")");
@@ -210,9 +210,10 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 		ResultSet rsFk = meta.getImportedKeys(catalog, schemaPattern, tableName);
 
 		while (rsFk.next()) {
-			result.append("\tFOREIGN KEY  ");
+			//result.append("\tFOREIGN KEY  ");
+			result.append("ALTER TABLE   ").append(schemaPattern).append(".").append(tableName).append(" ADD CONSTRAINT ");
 			result.append(rsFk.getString("FK_NAME"));
-			result.append(" (").append(rsFk.getString("FKCOLUMN_NAME")).append(") ").append(NL);
+			result.append(" FOREIGN KEY (").append(rsFk.getString("FKCOLUMN_NAME")).append(") ").append(NL);
 
 			result.append("\t\tREFERENCES " + rsFk.getString("PKTABLE_SCHEM")).append(".");
 			result.append(rsFk.getString("PKTABLE_NAME"));
@@ -256,8 +257,10 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 				// result.append("\t\t\tON DELETE SET NULL").append(NL);
 				result.append("\t\t\tON DELETE NO ACTION").append(NL);
 			}
+			result.append(";").append(NL);
 
 		}
+		
 		rsFk.close();
 		return result.toString();
 	}

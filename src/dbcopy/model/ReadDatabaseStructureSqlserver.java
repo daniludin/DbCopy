@@ -86,8 +86,8 @@ public class ReadDatabaseStructureSqlserver extends ReadDatabaseStructure {
 				resultCreateTables.append(listAttributesSorted(meta, null, null, tableSchema, tableName));
 				//resultCreateTables.append(")");
 				resultCreateTables.append(NL);
-				result.append(listPrimaryKeys(meta, null, tableSchema, tableName));
-				result.append(listUniqueConstraints(meta, conn, null, tableSchema, tableName));
+				//result.append(listPrimaryKeys(meta, null, tableSchema, tableName));
+				//result.append(listUniqueConstraints(meta, conn, null, tableSchema, tableName));
 				result.append(listForeignKeys(meta, null, tableSchema, tableName));
 			
 			}
