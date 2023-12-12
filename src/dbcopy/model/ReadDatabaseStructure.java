@@ -78,13 +78,23 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 			String columnName = rsColumns.getString("COLUMN_NAME");
 			String columnType = rsColumns.getString("TYPE_NAME").toUpperCase();
 			int columnSize = rsColumns.getInt("COLUMN_SIZE");
-			sbAttr.append("\t" + columnName + "\t" + columnType + "(" + columnSize + ")");
+			if (columnType.equals("IMAGE") || columnType.equals("NTEXT") || columnType.contains("INT IDENTITY") ) {
+				sbAttr.append("\t" + columnName + "\t" + columnType);
+			} else {
+				sbAttr.append("\t" + columnName + "\t" + columnType + "(" + columnSize + ")");
+			}
+			
+			
 			if (rsColumns.getInt("NULLABLE") == 0) {
 				sbAttr.append(" NOT NULL");
 			}
 			if (!rsColumns.isLast()) {
 				sbAttr.append(", ");
-
+			} else {
+				if (temp.length() > 0) {
+					sbAttr.append(", ");
+					
+				}
 			}
 			//sbAttr.append(listPrimaryKeys(meta, catalog, schemaPattern, tableName));
 			sbAttr.append(NL);
@@ -95,10 +105,11 @@ public abstract class ReadDatabaseStructure implements DatabaseStructureReader {
 
 		
 		if (temp.length() > 0) {
-			result.append(", ");				
+			//result.append(", ");				
 			result.append(temp);
 		}
-
+		result.append(")");
+		
 //		List<String> sortedKeys = new ArrayList<String>(sortedAttrs.keySet());
 //		Collections.sort(sortedKeys);
 //		for (String key : sortedKeys) {
